@@ -1,0 +1,43 @@
+image: node:16.15
+
+test_server:
+  before_script:
+    - apt-get update
+    - apt-get --yes --force-yes install rsync
+
+  only:
+    refs:
+      - development
+
+  script:
+    - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )'
+    # Run ssh-agent (inside the build environment)
+    - eval $(ssh-agent -s)
+    # Add the SSH key stored in SSH_PRIVATE_KEY variable to the agent store
+    - ssh-add <(echo "$STAGING_SSH_PRIVATE_KEY")
+    - mkdir -p ~/.ssh
+    - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
+    - yarn build
+    - rsync -avrc --delete "$PWD/" $STAGING_SSH_USERNAME@$STAGING_SERVER_IP:/home/$STAGING_SSH_USERNAME/$STAGING_PROJECT_NAME/
+    - ssh $STAGING_SSH_USERNAME@$STAGING_SERVER_IP "pm2 restart $STAGING_PROCESS --update-env"
+
+prod_server:
+  before_script:
+    - apt-get update
+    - apt-get --yes --force-yes install rsync
+
+  only:
+    refs:
+      - production
+
+  script:
+    - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )'
+    # Run ssh-agent (inside the build environment)
+    - eval $(ssh-agent -s)
+    # Add the SSH key stored in SSH_PRIVATE_KEY variable to the agent store
+    - ssh-add <(echo "$PROD_SSH_PRIVATE_KEY")
+    - mkdir -p ~/.ssh
+    - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
+    - yarn build
+    - rsync -avrc --delete "$PWD/" $PROD_SSH_USERNAME@$PROD_SERVER_IP:/home/$PROD_SSH_USERNAME/$PROD_PROJECT_NAME/
+    - ssh $PROD_SSH_USERNAME@$PROD_SERVER_IP "pm2 restart $PROD_PROCESS"

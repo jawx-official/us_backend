@@ -1,0 +1,13 @@
+node_modules
+.idea
+.DS_Store
+*.logs
+dist
+keys/*
+tsconfig2.json
+k8t/*
+argocd-install.yaml
+nodemon.json
+.vscode
+docs
+.editorconfig

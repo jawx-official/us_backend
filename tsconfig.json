@@ -1,0 +1,45 @@
+{
+    "compilerOptions": {
+        "module": "commonjs",
+        "target": "es6",
+        "outDir": "./dist",
+        "sourceMap": true,
+        "moduleResolution": "node",
+        "strict": true,
+        "useUnknownInCatchVariables": false,
+        "baseUrl": "./src",
+        "typeRoots": [
+            "./src/types"
+        ],
+        "paths": {
+            "@src/*": [
+                "./*"
+            ],
+            "@configs/*": [
+                "configs/*"
+            ],
+            "@exceptions/*": [
+                "exceptions/*"
+            ],
+            "@modules/*": [
+                "modules/*"
+            ],
+            "@middlewares/*": [
+                "middlewares/*"
+            ]
+        }
+    },
+    "include": [
+        "./src/types/**/*.d.ts",
+        "./src/**/*.ts"
+    ],
+    "exclude": [
+        "node_modules",
+        "./src/**/*.spec.ts",
+        "**/__test__/*.ts"
+    ],
+    "files": [
+        "./node_modules/@types/express/index.d.ts"
+    ],
+    "compileOnSave": true
+}

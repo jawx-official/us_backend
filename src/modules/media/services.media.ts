@@ -5,19 +5,16 @@ import {
     InvalidAccessCredentialsException,
 } from '@exceptions/index'
 import { MediaInterface, MediaServiceInputProps } from './interfaces.media'
-import { PortfolioInterface } from '../users/interfaces.portfolio'
 import { Readable, PassThrough, Stream } from 'stream'
 import * as ffmpeg from "fluent-ffmpeg"
 import * as fileUpload from 'express-fileupload'
 
 class MediaService extends Module {
     private media: Model<MediaInterface>
-    private portfolio: Model<PortfolioInterface>
 
     constructor(props: MediaServiceInputProps) {
         super()
         this.media = props.media
-        this.portfolio = props.portfolio
     }
 
     private bufferToStream(buffer: Buffer): Readable {
@@ -65,8 +62,7 @@ class MediaService extends Module {
         }).promise().then(async (data) => {
             // delete media with id=mediaId
             await this.media.findByIdAndDelete(mediaId);
-            // pull all media from portfolio where id is mediaId
-            await this.portfolio.updateOne({ gallery: mediaId }, { $pull: { gallery: mediaId } }, { safe: true })
+            // pull all media from property where id is mediaId
         }).catch(async (err) => {
         })
     }
@@ -95,8 +91,7 @@ class MediaService extends Module {
 
                 // delete media with id=mediaId
                 await this.media.findByIdAndDelete(mediaId);
-                // pull all media from portfolio where id is mediaId
-                await this.portfolio.updateOne({ gallery: mediaId }, { $pull: { gallery: mediaId } }, { safe: true })
+                // pull all media from property where id is mediaId
             }
         })
     }

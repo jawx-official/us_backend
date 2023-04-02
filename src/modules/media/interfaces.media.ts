@@ -1,9 +1,7 @@
 import { Model } from "mongoose";
-import { PortfolioInterface } from "../users/interfaces.portfolio";
 
 export interface MediaServiceInputProps {
     media: Model<MediaInterface>
-    portfolio: Model<PortfolioInterface>
 }
 
 export interface MediaInterface {

@@ -2,8 +2,6 @@
 import {
     User as UserModel,
     Otp as OtpModel,
-    Calendar as CalendarModel,
-    Portfolio as PortfolioModel,
     Media as MediaModel,
     Reviews as ReviewModel
 } from '@modules/models'
@@ -23,13 +21,10 @@ export const Auth = new AuthModule({
 
 export const Media = new MediaModule({
     media: MediaModel,
-    portfolio: PortfolioModel
 })
 
 export const User = new UserModule({
     users: UserModel,
-    calendar: CalendarModel,
-    portfolio: PortfolioModel
 })
 
 
@@ -41,8 +36,6 @@ export const Reviews = new ReviewsModule({
 export const Admin = new AdminModule({
     users: UserModel,
     media: MediaModel,
-    portfolio: PortfolioModel,
-    calendar: CalendarModel
 })
 
 
@@ -50,6 +43,4 @@ export const General = new GeneralModule({
     users: UserModel,
     media: MediaModel,
     reviews: ReviewModel,
-    portfolio: PortfolioModel,
-    calendar: CalendarModel
 })

@@ -12,9 +12,5 @@ router.use((req, res, next) => {
 // add non-token required endpoints before this line
 router.use(auth.verifyAdmin())
 // add endpoints that need token after this line
-router.get("/approvals", AdminController.fetchPendingApprovalArtists())
-
-router.get("/approvals/:artistId", AdminController.fetchArtistApplication())
-router.put("/approvals/:artistId", AdminController.reviewApplication())
 
 export default router

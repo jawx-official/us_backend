@@ -1,6 +1,4 @@
 import { Model, Schema, Document } from "mongoose";
-import { CalendarInterface } from "./interfaces.calendar";
-import { PortfolioInterface } from "./interfaces.portfolio";
 
 export enum AccountStatusEnums {
     PENDING = "pending",
@@ -22,8 +20,6 @@ export enum ReviewTypeEnums {
 
 export interface UserModuleProps {
     users: Model<UserInterface>
-    portfolio: Model<PortfolioInterface>
-    calendar: Model<CalendarInterface>
 }
 
 export interface ApplicationReview {

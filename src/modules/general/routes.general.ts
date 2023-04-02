@@ -4,11 +4,6 @@ import { GeneralController } from '../controllers'
 const auth = new Auth()
 const router: expressRouter = expressRouter()
 
-router.get("/artists", GeneralController.fetchApprovedArtists())
-router.get(
-    '/artists/:id',
-    GeneralController.fetchArtistAccount()
-)
 
 // add non-token required endpoints before this line
 router.use(auth.verify())

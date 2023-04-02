@@ -18,30 +18,6 @@ router.put(
     UserController.updateMyAccount()
 )
 
-router.put(
-    '/me/availability',
-    UserController.updateMyAvailability()
-)
-
-router.get(
-    '/me/availability',
-    UserController.fetchMyAvailability()
-)
-
-router.put(
-    '/me/portfolio',
-    UserController.updateMyPortfolio()
-)
-
-router.get(
-    '/me/portfolio',
-    UserController.fetchMyPortfolio()
-)
-
-router.put("/reviews/reply", UserController.replyApplicationReview())
-
-router.delete('/me/portfolio/media/:mediaId', UserController.deletePortfolioMedia())
-
 
 
 export default router

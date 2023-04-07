@@ -7,7 +7,8 @@ function asA(data: unknown): GoogleReturn {
     const keyValidators: Record<keyof GoogleReturn, Types> = {
         emailAddresses: "object",
         photos: "object",
-        names: "object"
+        names: "object",
+        phoneNumbers: "object"
     }
     if (typeof data === 'object' && data !== null) {
         let maybeA = data as GoogleReturn
@@ -27,7 +28,7 @@ export const authGoogle = async function (
 ): Promise<GoogleProfile> {
     try {
         let url =
-            'https://people.googleapis.com/v1/people/me?personFields=emailAddresses,names,photos,locations';
+            'https://people.googleapis.com/v1/people/me?personFields=emailAddresses,names,photos,locations,phoneNumbers';
         const response = await fetch(url, {
             method: "get",
             headers: {
@@ -48,12 +49,15 @@ export const authGoogle = async function (
         const userGoogleEmail = me.emailAddresses[0]?.value || ""
         const userAvatar = me.photos[0]?.url || ""
         const displayName = me.names[0]?.displayName || ""
+        const phone = me.phoneNumbers[0]?.value || ""
         return {
             channel: 'google',
             email: userGoogleEmail,
             avatar: userAvatar,
             name: displayName,
-            accessToken: access_token
+            phoneNumber: phone,
+            accessToken: access_token,
+
         }
     } catch (error) {
         throw new BadInputFormatException(

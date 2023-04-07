@@ -13,6 +13,7 @@ import {
 import { AuthModuleProps, ForgotPasswordInput, GoogleProfile, LoginInput, LoginReturn, NewAccount, OtpInterface, OtpRoleEnums, ResetPasswordInput, SocialLoginReturn, TokenPayloadInterface, VerifyInput } from '@modules/auth/interfaces.auth'
 export const tokenKey = '1Z2E3E4D5A6S7-8P9A0SSWORD'
 export const PASSWORD = '@11Poster'
+import { User } from '@modules/services'
 
 
 
@@ -38,7 +39,12 @@ class Auth extends Module {
             name: data.name,
             email: data.email,
             password: hashedPassword,
-            confirmed: false
+            confirmed: false,
+            accountType: data.accountType,
+            address: {
+                state: data.state,
+                city: data.city
+            },
         })
         // send verification email
         this.resendVerifyEmail(data.email)
@@ -92,13 +98,13 @@ class Auth extends Module {
         if (!isPasswordCorrect) {
             throw new BadInputFormatException("invalid login credentials. Try again with valid crendentials or signup to continue")
         }
-
+        const userObject = await User.fetchUserById(existingAccount._id);
         const payload: TokenPayloadInterface = { user: existingAccount._id.toString(), type: "auth" }
         const expiresIn = 1000 * 60 * 60 * 24
         const token = sign(payload, tokenKey, { expiresIn })
-
+        existingAccount.password = "";
         const returnObject: LoginReturn = {
-            user: existingAccount,
+            user: userObject,
             accessToken: {
                 expires: new Date().getTime() + expiresIn,
                 token
@@ -180,13 +186,14 @@ class Auth extends Module {
             }
             existingAccount.confirmed = true;
             await existingAccount.save()
+            const userObject = await User.fetchUserById(existingAccount._id);
             await otp.delete()
             const payload: TokenPayloadInterface = { user: existingAccount._id.toString(), type: "auth" }
             const expiresIn = 1000 * 60 * 60 * 24
             const token = sign(payload, tokenKey, { expiresIn })
-
+            existingAccount.password = "";
             const returnObject: LoginReturn = {
-                user: existingAccount,
+                user: userObject,
                 accessToken: {
                     expires: new Date().getTime() + expiresIn,
                     token
@@ -201,7 +208,8 @@ class Auth extends Module {
     public async SocialSignup(
         profile: GoogleProfile,
         accountType: string,
-        country: string
+        state: string,
+        city: string
     ): Promise<SocialLoginReturn> {
         const existingAccount = await this.model.findOne({ email: profile.email });
         if (existingAccount) {
@@ -214,16 +222,20 @@ class Auth extends Module {
             email: profile.email,
             confirmed: true,
             accountType,
-            country,
+            address: {
+                state,
+                city
+            },
             avatar: profile.avatar,
             password: hashedPassword
         })
 
+        const userObject = await User.fetchUserById(user._id);
         const payload: TokenPayloadInterface = { user: user._id.toString(), type: "auth" }
         const expiresIn = 1000 * 60 * 60 * 24
         const token = sign(payload, tokenKey, { expiresIn })
         const returnObject: LoginReturn = {
-            user: user,
+            user: userObject,
             accessToken: {
                 expires: new Date().getTime() + expiresIn,
                 token
@@ -242,13 +254,13 @@ class Auth extends Module {
 
         existingAccount.avatar = profile.avatar;
         await existingAccount.save()
-
+        const userObject = await User.fetchUserById(existingAccount._id);
         const payload: TokenPayloadInterface = { user: existingAccount._id.toString(), type: "auth" }
         const expiresIn = 1000 * 60 * 60 * 24
         const token = sign(payload, tokenKey, { expiresIn })
 
         const returnObject: LoginReturn = {
-            user: existingAccount,
+            user: userObject,
             accessToken: {
                 expires: new Date().getTime() + expiresIn,
                 token

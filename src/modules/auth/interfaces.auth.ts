@@ -1,5 +1,5 @@
 import { Model, Document } from "mongoose"
-import { UserInterface } from "@modules/users/interfaces.users"
+import { AccountTypeEnums, UserInterface } from "@modules/users/interfaces.users"
 
 export enum OtpRoleEnums {
     VERIFICATION = 'verification',
@@ -13,8 +13,9 @@ export interface NewAccount {
     email: string
     password: string
     name: string
-    accountType: string
-    country?: string
+    accountType: AccountTypeEnums.AGENT | AccountTypeEnums.CLIENT;
+    city: string;
+    state: string;
 }
 
 
@@ -81,6 +82,7 @@ export interface GoogleProfile {
     channel: string
     email: string
     name: string
+    phoneNumber: string;
     avatar: string
     accessToken?: string
 }
@@ -98,11 +100,16 @@ interface GoogleName {
     displayName: string;
 }
 
+interface GooglePhonenumber {
+    value: string;
+}
+
 
 
 export interface GoogleReturn {
     emailAddresses: GoogleEmail[]
     photos: GooglePhoto[]
     names: GoogleName[]
+    phoneNumbers: GooglePhonenumber[]
 }
 

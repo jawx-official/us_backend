@@ -1,6 +1,7 @@
 import * as Joi from 'joi';
 import { NewAccount, LoginInput } from '@modules/auth/interfaces.auth';
 import { AccountTypeEnums } from '../users/interfaces.users';
+// 'phoneNumber: Joi.string().pattern(/^\+[1-9]\d{0,2}\s\d{3}\s\d{4}$/),'
 
 const registerBody: Record<keyof NewAccount, any> = {
     email: Joi.string().required().email(),
@@ -9,7 +10,8 @@ const registerBody: Record<keyof NewAccount, any> = {
         .regex(/(\d)/).message("must contain one number")
         .regex(/(\W)/).message("must contain one special character"),
     name: Joi.string().required(),
-    country: Joi.string().required(),
+    state: Joi.string().required(),
+    city: Joi.string().required(),
     accountType: Joi.string().required().valid(...Object.values(AccountTypeEnums))
 };
 
@@ -57,14 +59,15 @@ export const forgot = {
 
 export const googleLogin = {
     body: Joi.object().keys({
-        access_token: Joi.string().required()
+        accessToken: Joi.string().required()
     }),
 };
 
 export const googleRegister = {
     body: Joi.object().keys({
         accountType: Joi.string().required().valid(...Object.values(AccountTypeEnums)),
-        country: Joi.string().required(),
-        access_token: Joi.string().required(), referalCode: Joi.string().optional(), inviteId: Joi.string().optional()
+        state: Joi.string().required(),
+        city: Joi.string().required(),
+        accessToken: Joi.string().required(), referalCode: Joi.string().optional(), inviteId: Joi.string().optional()
     }),
 };

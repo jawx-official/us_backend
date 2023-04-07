@@ -47,7 +47,7 @@ class AuthCtrl extends Ctrl {
                 const { name,
                     email,
                     password,
-                    country,
+                    state, city,
                     accountType
                 } = req.body
                 let input = {
@@ -55,7 +55,7 @@ class AuthCtrl extends Ctrl {
                     password,
                     name,
                     accountType,
-                    country
+                    state, city
                 }
                 await this.module.create(input)
                 this.ok(res, 'Account Created. Confirm Account to Continue')
@@ -110,8 +110,8 @@ class AuthCtrl extends Ctrl {
     googleLogin(): RequestHandler {
         return async (req: Request, res: Response): Promise<void> => {
             try {
-                const { access_token } = req.body
-                const result: GoogleProfile = await authGoogle(access_token)
+                const { accessToken } = req.body
+                const result: GoogleProfile = await authGoogle(accessToken)
                 const report = await this.module.socialLogin(result)
                 this.ok(res, report.message, report.data)
             } catch (error) {
@@ -123,9 +123,9 @@ class AuthCtrl extends Ctrl {
     googleRegister(): RequestHandler {
         return async (req: Request, res: Response): Promise<void> => {
             try {
-                const { access_token, accountType, country } = req.body
-                const result: GoogleProfile = await authGoogle(access_token)
-                const report = await this.module.SocialSignup(result, accountType, country)
+                const { accessToken, accountType, state, city } = req.body
+                const result: GoogleProfile = await authGoogle(accessToken)
+                const report = await this.module.SocialSignup(result, accountType, state, city)
                 this.ok(res, report.message, report.data)
             } catch (error) {
                 this.handleError(error, req, res)

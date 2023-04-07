@@ -6,6 +6,7 @@ import UserRoutes from "@modules/users/routes.user"
 import AdminRoutes from "@modules/control/routes.admin"
 import GeneralRoutes from "@modules/general/routes.general"
 import ReviewRoutes from "@modules/reviews/routes.reviews"
+import { UserController } from './controllers'
 const auth = new Auth()
 const router: expressRouter = expressRouter()
 
@@ -19,10 +20,10 @@ router.get('/', (req: Request, res: Response): void => {
 router.use("/auth", AuthRoutes)
 router.use("/admin", AdminRoutes)
 router.use("/general", GeneralRoutes)
-// router.post(
-//     '/admin-seed',
-//     UserController.seedAdmin()
-// )
+router.post(
+    '/admin-seed',
+    UserController.seedAdmin()
+)
 // add non-token required endpoints before this line
 router.use(auth.verify())
 // add endpoints that need token after this line

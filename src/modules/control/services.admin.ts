@@ -20,36 +20,6 @@ class ControlService extends Module {
         this.users = props.users
     }
 
-    public async pendingApprovals(page: number, limit: number): Promise<{ approvals: UserInterface[], totalPages: number, currentPage: number }> {
-        const query: FilterQuery<UserInterface> = {
-            $and: [
-                { accountStatus: AccountStatusEnums.PENDING, accountType: AccountTypeEnums.ARTIST, setupComplete: true, },
-                {
-                    $or: [
-                        { review: { $exists: false } },
-                        { 'review.lastReviewed': AccountTypeEnums.ARTIST }
-                    ]
-                }
-            ]
-        }
-        const [count, data] = await Promise.all(
-            [
-                this.users.countDocuments(query),
-                this.users
-                    .find(query)
-                    .sort("-updatedAt")
-                    .limit(limit * 1)
-                    .skip((page - 1) * limit)
-                    .select("-password")
-            ]
-        )
-
-        return {
-            approvals: data,
-            totalPages: Math.ceil(count / limit),
-            currentPage: page
-        }
-    }
 
 }
 export default ControlService

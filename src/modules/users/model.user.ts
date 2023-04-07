@@ -1,37 +1,99 @@
-import { AccountStatusEnums, AccountTypeEnums, ApplicationReview, ReviewTypeEnums, UserInterface } from '@modules/users/interfaces.users';
-import { Connection, Model, Schema } from 'mongoose';
+import { AccountStatusEnums, AccountTypeEnums, Address, ApplicationReview, Certification, KYCInformation, ReviewTypeEnums, UserInterface } from '@modules/users/interfaces.users';
+import { Connection, Model, Schema, SchemaTypes } from 'mongoose';
 import { v4 } from "uuid";
 
-const Review = new Schema<ApplicationReview>(
-    {
-        comment: {
-            type: String,
-        },
-        lastReviewed: {
-            type: String,
-            enum: Object.values(AccountTypeEnums),
-        },
-        reviewType: {
-            type: String,
-            enum: Object.values(ReviewTypeEnums)
-        }
+const AddressSchema = new Schema<Address>({
+    city: {
+        type: String
     },
-    {
-        _id: false
+    state: {
+        type: String
+    },
+    location: {
+        type: {
+            type: String,
+            enum: ['Point'],
+            default: "Point",
+        },
+        coordinates: {
+            type: [SchemaTypes.Number],
+            required: true
+        },
+        formattedAddress: {
+            type: String
+        }
     }
-)
+}, {
+    _id: false, timestamps: false
+})
+
+const companyScheam = new Schema({
+    name: {
+        type: String
+    },
+    registerationNumber: {
+        type: String
+    },
+    address: {
+        type: AddressSchema
+    }
+}, {
+    _id: false, timestamps: false
+})
+
+
+const certificationScheam = new Schema<Certification>({
+    name: {
+        type: String
+    },
+    file: {
+        type: String,
+        ref: "Media"
+    },
+}, {
+    _id: false, timestamps: false
+})
+
+const kycSchema = new Schema<Omit<KYCInformation, "address">>({
+    proofOfAddress: {
+        type: String,
+        ref: "Media"
+    },
+    identification: {
+        type: String,
+        ref: "Media"
+    },
+    certifications: {
+        type: [certificationScheam]
+    },
+    nationality: {
+        type: String
+    },
+    incomeLevel: {
+        type: String
+    },
+    occupation: {
+        type: String
+    },
+    phoneNumber: {
+        type: String
+    },
+    isCompany: {
+        type: Boolean
+    },
+    companyInformation: {
+        type: companyScheam
+    },
+}, {
+    _id: false, timestamps: false
+})
+
 
 export const UserSchema = new Schema<UserInterface>(
     {
         _id: { type: String, default: () => v4() },
         name: {
             type: Schema.Types.String
-        },
-        bio: {
-            type: Schema.Types.String
-        },
-        genres: {
-            type: [Schema.Types.String]
         },
         email: {
             type: Schema.Types.String,
@@ -42,8 +104,8 @@ export const UserSchema = new Schema<UserInterface>(
             type: Schema.Types.String,
             required: true
         },
-        review: {
-            type: Review
+        address: {
+            type: AddressSchema
         },
         accountStatus: {
             type: String,
@@ -57,10 +119,7 @@ export const UserSchema = new Schema<UserInterface>(
         accountType: {
             type: String,
             enum: Object.values(AccountTypeEnums),
-            default: AccountTypeEnums.ARTIST
-        },
-        country: {
-            type: Schema.Types.String
+            default: AccountTypeEnums.CLIENT
         },
         confirmed: {
             type: Schema.Types.Boolean,
@@ -76,7 +135,18 @@ export const UserSchema = new Schema<UserInterface>(
         },
         avatar: {
             type: String,
-            default: ''
+            default: '',
+            ref: "Media"
+        },
+        kyc: {
+            type: kycSchema
+        },
+        avatarColor: {
+            type: String,
+            default: function () {
+                var colors = ["#F3E503", "#0F1825", "#23B3E8", "#F15832", "#4DBD98"]
+                return colors[Math.floor(Math.random() * colors.length)]
+            }
         },
     },
     {

@@ -1,7 +1,7 @@
 import { Model } from 'mongoose'
 import { verify } from 'jsonwebtoken'
 import { hashSync } from "bcryptjs";
-import { AccountStatusEnums, AccountTypeEnums, ApplicationReview, ReviewTypeEnums, UserInterface, UserModuleProps } from '@modules/users/interfaces.users'
+import { AccountStatusEnums, AccountTypeEnums, ApplicationReview, KYCInformation, ReviewTypeEnums, UserInterface, UserModuleProps } from '@modules/users/interfaces.users'
 import Module from '@modules/module'
 import {
     BadInputFormatException,
@@ -30,24 +30,80 @@ class UserService extends Module {
         return user
     }
 
+    public async fetchUserById(userId: string): Promise<UserInterface> {
+        const user = await this.users.findOne({ _id: userId }).populate('avatar').populate("kyc.proofOfAddress").populate("kyc.identification").populate("kyc.certifications.file")
+        if (!user) throw new InvalidAccessCredentialsException("Account not found")
+        user.password = "";
+        return user
+    }
+
     public async updateMyUserAccount(user: UserInterface, update: Partial<UserInterface>): Promise<UserInterface> {
         const updatedInfo = await this.users.findByIdAndUpdate(user._id, { $set: { ...update } }, { new: true })
         if (updatedInfo) {
-            return updatedInfo;
+            return this.fetchUserById(user._id);
         } else {
             throw new InvalidAccessCredentialsException("Could not update your account")
         }
     }
 
+    public async updateClientKYC(user: UserInterface, update: Omit<KYCInformation, "isCompany" | "companyInformation">): Promise<UserInterface> {
+        const updateBody: Partial<UserInterface> = user;
+        updateBody.kyc = update;
+        updateBody.setupComplete = true;
+        if (updateBody.address && updateBody.address.location) {
+            updateBody.address.location.coordinates = update.address.coordinates;
+            updateBody.address.location.formattedAddress = update.address.formattedAddress;
+        } else {
+            updateBody.address = {
+                state: user.address?.state || "",
+                city: user.address?.city || "",
+                location: {
+                    type: "Point",
+                    ...update.address
+                }
+            }
+        }
+        const updatedInfo = await this.users.findByIdAndUpdate(user._id, { $set: { ...updateBody } }, { new: true })
+        if (updatedInfo) {
+            return this.fetchUserById(user._id);
+        } else {
+            throw new InvalidAccessCredentialsException("Could not update your account")
+        }
+    }
+
+    public async updateAgentKYC(user: UserInterface, update: KYCInformation): Promise<UserInterface> {
+        const updateBody: Partial<UserInterface> = user;
+        updateBody.kyc = update;
+        updateBody.setupComplete = true;
+        if (updateBody.address && updateBody.address.location) {
+            updateBody.address.location.coordinates = update.address.coordinates;
+            updateBody.address.location.formattedAddress = update.address.formattedAddress;
+        } else {
+            updateBody.address = {
+                state: user.address?.state || "",
+                city: user.address?.city || "",
+                location: {
+                    type: "Point",
+                    ...update.address
+                }
+            }
+        }
+
+        const updatedInfo = await this.users.findByIdAndUpdate(user._id, { $set: { ...updateBody } }, { new: true })
+        if (updatedInfo) {
+            return this.fetchUserById(user._id);
+        } else {
+            throw new InvalidAccessCredentialsException("Could not update your account")
+        }
+    }
+
+
     public async seedAdmin() {
         const admin: Partial<UserInterface> = {
-            name: "Saleh Prince",
+            name: "Jerome Prince",
             confirmed: true,
-            email: "saleh.prince@mailinator.com",
-            genres: [],
-            bio: "this is a short bio",
-            password: "Wdat1234!",
-            referalCode: "",
+            email: "jerome.prince@mailinator.com",
+            password: "Jackia23!",
             accountStatus: AccountStatusEnums.ACTIVE,
             accountType: AccountTypeEnums.ADMIN,
             deleted: false,

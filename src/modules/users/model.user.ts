@@ -1,4 +1,4 @@
-import { AccountStatusEnums, AccountTypeEnums, Address, ApplicationReview, Certification, KYCInformation, ReviewTypeEnums, UserInterface } from '@modules/users/interfaces.users';
+import { AccountStatusEnums, AccountTypeEnums, Address, ApplicationReview, Certification, IDTypes, Identification, KYCInformation, ReviewTypeEnums, UserInterface } from '@modules/users/interfaces.users';
 import { Connection, Model, Schema, SchemaTypes } from 'mongoose';
 import { v4 } from "uuid";
 
@@ -54,14 +54,29 @@ const certificationScheam = new Schema<Certification>({
     _id: false, timestamps: false
 })
 
+const identificationSchema = new Schema<Identification>({
+    idType: {
+        type: String,
+        enum: Object.values(IDTypes),
+    },
+    idNumber: {
+        type: String,
+    },
+    verified: {
+        type: Boolean,
+        default: false
+    }
+}, {
+    _id: false, timestamps: false
+})
+
 const kycSchema = new Schema<Omit<KYCInformation, "address">>({
     proofOfAddress: {
         type: String,
         ref: "Media"
     },
     identification: {
-        type: String,
-        ref: "Media"
+        type: identificationSchema,
     },
     certifications: {
         type: [certificationScheam]

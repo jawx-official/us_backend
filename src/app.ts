@@ -11,6 +11,7 @@ import * as fileupload from "express-fileupload"
 import AppConfig from '@configs/app'
 import { ctrl } from '@modules/controllers'
 import router from '@modules/routes'
+import EventsManager from './utils/events'
 
 /**
  * Express application
@@ -25,12 +26,14 @@ class Application {
 	 * @constructor
 	 */
 	constructor() {
+		const eventsManager = new EventsManager();
 		this.express = express()
 		this.configure()
 		this.handleExceptions()
 		this.express.listen(AppConfig.port, () => {
 			console.log(`${AppConfig.appName} is listening at port ${AppConfig.port}`)
 		})
+		eventsManager.init();
 	}
 
 	/**
@@ -47,6 +50,7 @@ class Application {
 		this.express.options('*', cors())
 		this.express.use(helmet())
 		this.express.use('/v1', router)
+
 	}
 
 	/**

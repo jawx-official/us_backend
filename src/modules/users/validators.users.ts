@@ -1,11 +1,14 @@
 import * as Joi from 'joi';
 import { NewAccount, LoginInput } from '@modules/auth/interfaces.auth';
-import { AccountTypeEnums, KYCInformation } from '../users/interfaces.users';
+import { AccountTypeEnums, IDTypes, KYCInformation } from '../users/interfaces.users';
 // 'phoneNumber: Joi.string().pattern(/^\+[1-9]\d{0,2}\s\d{3}\s\d{4}$/),'
 
 const clientKycBody: Record<keyof Omit<KYCInformation, "isCompany" | "companyInformation">, any> = {
     proofOfAddress: Joi.string().required(),
-    identification: Joi.string().required(),
+    identification: Joi.object().keys({
+        idType: Joi.string().required().valid(...Object.values(IDTypes)),
+        idNumber: Joi.string().required()
+    }).required(),
     certifications: Joi.array().items({
         name: Joi.string().required(),
         file: Joi.string().required()
@@ -22,7 +25,10 @@ const clientKycBody: Record<keyof Omit<KYCInformation, "isCompany" | "companyInf
 
 const agentKycBody: Record<keyof KYCInformation, any> = {
     proofOfAddress: Joi.string().required(),
-    identification: Joi.string().required(),
+    identification: Joi.object().keys({
+        idType: Joi.string().required().valid(...Object.values(IDTypes)),
+        idNumber: Joi.string().required()
+    }).required(),
     certifications: Joi.array().items({
         name: Joi.string().required(),
         file: Joi.string().required()

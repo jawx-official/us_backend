@@ -97,17 +97,54 @@ class MediaService extends Module {
     }
 
 
+    private async uploadVideoToS3(mediaId: string, file: fileUpload.UploadedFile, newFileName: string) {
+        const s3Client = new S3({
+            credentials: {
+                accessKeyId: process.env.AWS_ACCESS_KEY || '',
+                secretAccessKey: process.env.AWS_ACCESS_SECRET || ""
+            },
+            s3ForcePathStyle: true,
+        })
+        const stream = this.bufferToStream(file.data);
+        await s3Client.upload({
+            Bucket: process.env.AWS_BUCKET_NAME || '',
+            Key: newFileName,
+            Body: stream
+        }).promise().then(async (data) => {
+            await this.media.findByIdAndUpdate(mediaId, { $set: { url: data.Location, aws_id: data.Key } });
+        }).catch(async (err) => {
+            if (err) {
+                console.log(err);
+
+                // delete media with id=mediaId
+                await this.media.findByIdAndDelete(mediaId);
+                // pull all media from property where id is mediaId
+            }
+        })
+    }
+
+
 
     public async saveMedia(file: fileUpload.UploadedFile): Promise<MediaInterface> {
+        let fileType = file.mimetype;
+        let ext = file.name.split(".")[1]
+        if (file.mimetype.startsWith("image/")) {
+            fileType = "image/webp"
+            ext = ".webp"
+        }
         const new_media = new this.media({
-            file_type: "image/webp",
+            fileType,
         })
-        let fileName = new_media._id + ".webp"
+        let fileName = new_media._id + ext
         //  + file.mimetype.split('/')[1];
         new_media.url = process.env.AWS_S3_BASE_URL + 'stage-seekers-0/' + fileName;
         await new_media.save()
         // upload to aws
-        this.uploadToS3(new_media._id, file, fileName);
+        if (file.mimetype.startsWith("image/")) {
+            this.uploadToS3(new_media._id, file, fileName);
+        } else {
+            this.uploadVideoToS3(new_media._id, file, fileName);
+        }
         return new_media;
     }
 

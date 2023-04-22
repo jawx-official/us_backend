@@ -3,13 +3,15 @@ import {
     User as UserModel,
     Otp as OtpModel,
     Media as MediaModel,
-    Reviews as ReviewModel
+    Reviews as ReviewModel,
+    Properties as PropertiesModel
 } from '@modules/models'
 import AuthModule from '@modules/auth/services.auth'
 import UserModule from '@modules/users/services.users'
 import MediaModule from '@modules/media/services.media'
 import GeneralModule from '@modules/general/services.general'
 import ReviewsModule from '@modules/reviews/services.reviews'
+import PropertiesModule from '@modules/properties/properties.services'
 
 import AdminModule from '@modules/control/services.admin'
 // import SeedModule from '@modules/data.module'
@@ -36,6 +38,10 @@ export const Reviews = new ReviewsModule({
 export const Admin = new AdminModule({
     users: UserModel,
     media: MediaModel,
+})
+
+export const Properties = new PropertiesModule({
+    properties: PropertiesModel
 })
 
 

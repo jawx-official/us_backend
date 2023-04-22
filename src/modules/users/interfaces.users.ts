@@ -46,9 +46,20 @@ export interface Certification {
     file: string | MediaInterface;
 }
 
+export enum IDTypes {
+    NIN = "nin",
+    BVN = "bvn"
+}
+
+export interface Identification {
+    idType: IDTypes,
+    idNumber: string;
+    verified: boolean;
+}
+
 export interface KYCInformation {
     proofOfAddress: string | MediaInterface;
-    identification: string | MediaInterface;
+    identification: Identification;
     certifications: [Certification];
     nationality: string;
     incomeLevel: string;
@@ -78,7 +89,9 @@ export interface UserInterface extends Document {
     accountStatus: AccountStatusEnums;
     accountType: AccountTypeEnums;
     deleted: boolean;
+    dob: Date;
     kyc: Partial<KYCInformation>;
+    review?: ApplicationReview;
     setupComplete: boolean;
     online: boolean;
     avatar?: string | MediaInterface;

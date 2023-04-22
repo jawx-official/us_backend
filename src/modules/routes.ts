@@ -6,6 +6,7 @@ import UserRoutes from "@modules/users/routes.user"
 import AdminRoutes from "@modules/control/routes.admin"
 import GeneralRoutes from "@modules/general/routes.general"
 import ReviewRoutes from "@modules/reviews/routes.reviews"
+import PropertiesRoutes from "@modules/properties/properties.routes"
 import { UserController } from './controllers'
 const auth = new Auth()
 const router: expressRouter = expressRouter()
@@ -28,6 +29,7 @@ router.post(
 router.use(auth.verify())
 // add endpoints that need token after this line
 router.use("/users", UserRoutes)
+router.use("/property", PropertiesRoutes)
 router.use("/reviews", ReviewRoutes)
 
 export default router

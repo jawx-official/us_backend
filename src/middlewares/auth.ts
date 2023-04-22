@@ -44,27 +44,94 @@ class AuthMiddleware extends Ctrl {
 		): Promise<void> => {
 			try {
 
-				let token: string | undefined = req.headers['authorization']
-				if (!token || !token.includes('Bearer')) {
-					throw new InvalidAccessCredentialsException(
-						'Invalid bearer token provided'
-					)
+				if (!req.user) {
+					throw new InvalidAccessCredentialsException();
 				}
-				token = token.split('Bearer ')[1]
-				const account = await User.fetchUserWithToken(token);
-				if (account.accountType !== AccountTypeEnums.ADMIN) {
-					throw new InvalidAccessCredentialsException(
-						'Only admins are allowed to access this resource'
-					)
+				if (req.user.accountType === AccountTypeEnums.ADMIN) {
+					next()
+				} else {
+					throw new InvalidAccessCredentialsException("Only admins can access these resources");
 				}
-				req.user = account;
-				next()
 			} catch (ex) {
 				let error = new Exception(ex.message)
 				this.handleError(error, req, res)
 			}
 		}
 	}
+
+	verifyClients(): RequestHandler {
+		return async (
+			req: Request,
+			res: Response,
+			next: NextFunction
+		): Promise<void> => {
+			try {
+
+				if (!req.user) {
+					throw new InvalidAccessCredentialsException();
+				}
+				if (req.user.accountType === AccountTypeEnums.CLIENT) {
+					next()
+				} else {
+					throw new InvalidAccessCredentialsException("Only clients can access these resources");
+				}
+			} catch (ex) {
+				let error = new Exception(ex.message)
+				this.handleError(error, req, res)
+			}
+		}
+	}
+
+	verifyAgents(): RequestHandler {
+		return async (
+			req: Request,
+			res: Response,
+			next: NextFunction
+		): Promise<void> => {
+			try {
+
+				if (!req.user) {
+					throw new InvalidAccessCredentialsException();
+				}
+				if (req.user.accountType === AccountTypeEnums.AGENT) {
+					next()
+				} else {
+					throw new InvalidAccessCredentialsException("Only agents can access these resources");
+				}
+			} catch (ex) {
+				let error = new Exception(ex.message)
+				this.handleError(error, req, res)
+			}
+		}
+	}
+
+
+
+	verifyLandlords(): RequestHandler {
+		return async (
+			req: Request,
+			res: Response,
+			next: NextFunction
+		): Promise<void> => {
+			try {
+
+				if (!req.user) {
+					throw new InvalidAccessCredentialsException();
+				}
+				if (req.user.accountType === AccountTypeEnums.LANDLORD) {
+					next()
+				} else {
+					throw new InvalidAccessCredentialsException("Only landlords can access these resources");
+				}
+			} catch (ex) {
+				let error = new Exception(ex.message)
+				this.handleError(error, req, res)
+			}
+		}
+	}
+
+
+
 }
 
 export default AuthMiddleware

@@ -3,6 +3,7 @@ node_modules
 .DS_Store
 *.logs
 dist
+.env.*
 keys/*
 tsconfig2.json
 k8t/*

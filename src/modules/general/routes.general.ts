@@ -1,4 +1,4 @@
-import { Request, Response, Router as expressRouter } from 'express'
+import { Router as expressRouter } from 'express'
 import Auth from '@src/middlewares/auth'
 import { GeneralController } from '../controllers'
 const auth = new Auth()

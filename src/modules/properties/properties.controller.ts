@@ -27,7 +27,7 @@ class PropertyController extends Ctrl {
                 const { user, body } = req
                 if (!user) throw new InvalidAccessCredentialsException()
                 await this.module.createPropertyService(user, body)
-
+                this.ok(res, 'Your property has been saved');
             } catch (error) {
                 this.handleError(error, req, res)
             }
@@ -41,7 +41,7 @@ class PropertyController extends Ctrl {
                 const { id } = req.params
                 if (!user) throw new InvalidAccessCredentialsException()
                 await this.module.updateUserPropertyByID(user, id, body)
-
+                this.ok(res, 'Your property has been updated');
             } catch (error) {
                 this.handleError(error, req, res)
             }
@@ -55,7 +55,7 @@ class PropertyController extends Ctrl {
                 const { id } = req.params
                 if (!user) throw new InvalidAccessCredentialsException()
                 await this.module.publishUserPropertyByID(user, id)
-
+                this.ok(res, 'Your property has been published');
             } catch (error) {
                 this.handleError(error, req, res)
             }
@@ -74,7 +74,8 @@ class PropertyController extends Ctrl {
                 }
 
                 if (!user) throw new InvalidAccessCredentialsException()
-                await this.module.fetchUserProperties(user, filter)
+                const items = await this.module.fetchUserProperties(user, filter);
+                this.ok(res, 'Your properties', items);
 
             } catch (error) {
                 this.handleError(error, req, res)
@@ -88,8 +89,8 @@ class PropertyController extends Ctrl {
                 const { user } = req
                 const { id } = req.params
                 if (!user) throw new InvalidAccessCredentialsException()
-                await this.module.fetchUserPropertyByID(user, id)
-
+                const item = await this.module.fetchUserPropertyByID(user, id)
+                if (item) this.ok(res, 'Your property');
             } catch (error) {
                 this.handleError(error, req, res)
             }
@@ -103,7 +104,7 @@ class PropertyController extends Ctrl {
                 const { id } = req.params
                 if (!user) throw new InvalidAccessCredentialsException()
                 await this.module.disableUserPropertyByID(user, id)
-
+                this.ok(res, 'Your property has been disabled');
             } catch (error) {
                 this.handleError(error, req, res)
             }

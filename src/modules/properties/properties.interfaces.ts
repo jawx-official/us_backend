@@ -1,6 +1,6 @@
 import { Model, Schema, Document } from "mongoose";
 import { MediaInterface } from "../media/interfaces.media";
-import { UserInterface } from "../users/interfaces.users";
+import { ApplicationReview, UserInterface } from "../users/interfaces.users";
 
 export enum PropertyStatusEnums {
     PENDING = "pending",
@@ -111,6 +111,8 @@ export interface PropertyInterface extends Document {
     features: string[];
     bathrooms: number;
     bedrooms: number;
+    review?: ApplicationReview;
+    approved: boolean;
     createdAt?: Date;
     updatedAt?: Date;
 }

@@ -7,17 +7,20 @@ import {
 import { MediaInterface, MediaServiceInputProps } from '@modules/media/interfaces.media'
 import { AccountStatusEnums, AccountTypeEnums, ApplicationReview, ReviewTypeEnums, UserInterface } from '../users/interfaces.users'
 import { AdminServiceInputProps } from './interfaces.admin'
+import { PropertyInterface, PropertyStatusEnums } from '../properties/properties.interfaces'
 
 
 
 class ControlService extends Module {
     private media: Model<MediaInterface>
     private users: Model<UserInterface>
+    private properties: Model<PropertyInterface>
 
     constructor(props: AdminServiceInputProps) {
         super()
         this.media = props.media
         this.users = props.users
+        this.properties = props.properties
     }
 
     public async pendingApprovals(page: number, limit: number): Promise<{ approvals: UserInterface[], totalPages: number, currentPage: number }> {
@@ -84,6 +87,66 @@ class ControlService extends Module {
         await user.save();
 
         return this.fetchUserApplication(userId)
+    }
+
+
+
+
+    // property approvals
+    public async pendingPropertyApprovals(page: number, limit: number): Promise<{ approvals: PropertyInterface[], totalPages: number, currentPage: number }> {
+        const query: FilterQuery<PropertyInterface> = {
+            $and: [
+                { status: PropertyStatusEnums.OPEN },
+                { approved: { $ne: true } },
+            ]
+        }
+        const [count, data] = await Promise.all(
+            [
+                this.properties.countDocuments(query),
+                this.properties
+                    .find(query)
+                    .sort("-updatedAt")
+                    .limit(limit * 1)
+                    .skip((page - 1) * limit)
+                    .populate('media')
+                    .populate("agent")
+                    .populate("landlord")
+            ]
+        )
+
+        return {
+            approvals: data,
+            totalPages: Math.ceil(count / limit),
+            currentPage: page
+        }
+    }
+
+
+    public async fetchPropertyApplication(propertyId: string): Promise<PropertyInterface> {
+        let property = await this.properties
+            .findOne({ _id: propertyId })
+            .populate('media')
+            .populate("agent")
+            .populate("landlord")
+        if (!property) throw new InvalidAccessCredentialsException("Property not found")
+
+        return property
+    }
+
+
+    public async reviewPropertyApplication(propertyId: string, review: ApplicationReview): Promise<PropertyInterface> {
+        const property = await this.properties.findById(propertyId);
+        if (!property) throw new BadInputFormatException("Not found");
+        if (review.reviewType == ReviewTypeEnums.APPROVE) {
+            property.status = PropertyStatusEnums.OPEN;
+            property.approved = true;
+        } else if (review.reviewType == ReviewTypeEnums.COMMENT) {
+            property.review = review;
+        }
+
+        await property.save();
+
+        return this.fetchPropertyApplication(propertyId)
     }
 
 

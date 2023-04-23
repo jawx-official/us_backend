@@ -41,6 +41,22 @@ const companyScheam = new Schema({
     _id: false, timestamps: false
 })
 
+export const reviewSchema = new Schema<ApplicationReview>({
+    comment: {
+        type: String
+    },
+    reviewType: {
+        type: String,
+        enum: Object.values(ReviewTypeEnums)
+    },
+    lastReviewed: {
+        type: String,
+        enum: Object.values(AccountTypeEnums)
+    }
+}, {
+    _id: false, timestamps: false
+})
+
 
 const certificationScheam = new Schema<Certification>({
     name: {
@@ -155,6 +171,9 @@ export const UserSchema = new Schema<UserInterface>(
         },
         kyc: {
             type: kycSchema
+        },
+        review: {
+            type: reviewSchema
         },
         avatarColor: {
             type: String,

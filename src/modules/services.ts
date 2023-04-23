@@ -38,6 +38,7 @@ export const Reviews = new ReviewsModule({
 export const Admin = new AdminModule({
     users: UserModel,
     media: MediaModel,
+    properties: PropertiesModel
 })
 
 export const Properties = new PropertiesModule({
@@ -49,4 +50,5 @@ export const General = new GeneralModule({
     users: UserModel,
     media: MediaModel,
     reviews: ReviewModel,
+    properties: PropertiesModel
 })

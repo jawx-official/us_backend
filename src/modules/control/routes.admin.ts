@@ -17,4 +17,10 @@ router.get("/approvals", AdminController.fetchPendingApprovalUsers())
 router.get("/approvals/:userId", AdminController.fetchUserApplication())
 router.put("/approvals/:userId", AdminController.reviewApplication())
 
+// property approvals
+router.get("/property-approvals", AdminController.fetchPendingApprovalProperties())
+
+router.get("/property-approvals/:propertyId", AdminController.fetchPropertyApplication())
+router.put("/property-approvals/:propertyId", AdminController.reviewPropertyApplication())
+
 export default router

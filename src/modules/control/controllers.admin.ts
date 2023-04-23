@@ -55,5 +55,45 @@ class AdminControl extends Ctrl {
         }
     }
 
+
+
+    fetchPendingApprovalProperties(): RequestHandler {
+        return async (req: Request, res: Response): Promise<void> => {
+            try {
+                const { page = 1, limit = 1 } = req.query;
+                const approvals = await this.module.pendingPropertyApprovals(Number(page as string), Number(limit as string))
+                this.ok(res, "These are the pending approvals.", approvals)
+            } catch (error) {
+                this.handleError(error, req, res)
+            }
+        }
+    }
+
+    fetchPropertyApplication(): RequestHandler {
+        return async (req: Request, res: Response): Promise<void> => {
+            try {
+                const { propertId } = req.params;
+                const application = await this.module.fetchPropertyApplication(propertId)
+                this.ok(res, "This is the application you requested", application)
+            } catch (error) {
+                this.handleError(error, req, res)
+            }
+        }
+    }
+
+
+    reviewPropertyApplication(): RequestHandler {
+        return async (req: Request, res: Response): Promise<void> => {
+            try {
+                const { propertId } = req.params;
+                const { review } = req.body
+                const application = await this.module.reviewPropertyApplication(propertId, review)
+                this.ok(res, "Your review has been saved", application)
+            } catch (error) {
+                this.handleError(error, req, res)
+            }
+        }
+    }
+
 }
 export default AdminControl

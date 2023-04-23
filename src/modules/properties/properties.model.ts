@@ -1,6 +1,7 @@
 import { Connection, Model, Schema, SchemaTypes } from 'mongoose';
 import { v4 } from "uuid";
 import { IPricing, Installments, PropertyInterface, PropertyStatusEnums, PurchaseTypeEnum, RentDurationEnum } from './properties.interfaces';
+import { reviewSchema } from '../users/model.user';
 
 
 const Installmental = new Schema<Installments>({
@@ -99,6 +100,9 @@ export const PropertySchema = new Schema<PropertyInterface>(
         serviced: {
             type: SchemaTypes.Boolean
         },
+        approved: {
+            type: SchemaTypes.Boolean
+        },
         toilets: {
             type: SchemaTypes.Number
         },
@@ -107,6 +111,9 @@ export const PropertySchema = new Schema<PropertyInterface>(
         },
         bedrooms: {
             type: SchemaTypes.Number
+        },
+        review: {
+            type: reviewSchema
         },
         sponsored: {
             type: Sponsored
